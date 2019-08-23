@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+	
+	<title>Map - Vant</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link
+	href="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/leaflet.css"
+	rel="stylesheet">
+
+    <link
+        href="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/sidebar/leaflet-sidebar.min.css"
+        rel="stylesheet" />
+
+    <link rel="stylesheet"
+        href="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/leaflet-measure/leaflet-measure.css" />
+
+    <link rel="stylesheet"
+        href="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/leaflet.easybutton/easy-button.css" />
+    <link rel="stylesheet"
+        href="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/Control.FullScreen.css" />
+   <!-- <link rel="stylesheet" href="assets/leaflet/leaflet.extra-markers.min.css">-->
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 800px;
+			height: 600px;
+		}
+	</style>	
+</head>
+
+<body>
+
+<div id='map'></div>
+
+
+    <script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/leaflet-src.js"></script>
+	<script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/geojson-vt/geojson-vt.js"></script>
+	<script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/sidebar/leaflet-sidebar.min.js"></script>
+	<script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/leaflet-ajax/leaflet.ajax.min.js"></script>
+	<script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/hash/leaflet-hash.js"></script>
+	<script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/geojson-vt/L.GridLayer.GeoJSON.js"></script>
+	<script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/leaflet.easybutton/easy-button.js"></script>
+	<script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/turf/turf.min.js"></script>
+	<script src='https://npmcdn.com/@turf/turf/turf.min.js'></script>
+
+	<script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/leaflet-measure/src/leaflet-measure.js"></script>
+
+	<!-- full screen -->
+	<script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/Control.FullScreen.js"></script>
+	<!--<script src="assets/leaflet/leaflet.extra-markers.min.js"></script>-->
+	
+	<!-- side by side -->
+	<script
+		src="https://d3buq5lbuoclqa.cloudfront.net/static/leaflet/plugins/leaflet-side-by-side/leaflet-side-by-side.min.js"></script>
+	
+	<!-- <script src="https://d3buq5lbuoclqa.cloudfront.net/static/plugins/jquery/jquery-3.3.1.min.js"></script> -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+
+    <script>
+        const url_vant = "http://18.228.201.226/api/aws/s3/";
+        var map;
+        
+        drawMap();
+    
+        function drawMap(){
+
+            // ------ Creating a Layer object -----------
+            var vant = L.tileLayer(url_vant+'tesla-dump/scicrop-agroapi-vant/2018-19/410021/2018-05-14/tiles/{z}/{x}/{y}.png', { tms: true, opacity: 1, minZoom: 14, maxZoom: 22, minNativeZoom: 14, maxNativeZoom: 22, });
+            //var vant = L.tileLayer(url_vant+'tesla-dump/scicrop-agroapi-vant/2018-19/401314/2018-08-06/tiles/{z}/{x}/{y}.png', { tms: true, opacity: 1, minZoom: 14, maxZoom: 22, minNativeZoom: 14, maxNativeZoom: 22, });
+
+            var normal = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', { attribution: 'SciCrop', maxZoom: 18, id: 'mapbox.streets', accessToken: 'pk.eyJ1IjoidGhhbGVzZ2JyYW5kYW8iLCJhIjoiY2loM2llamx0MHl6Znd5bTB4b3BpZHJyZiJ9.Auxd4uKeTzg3AhyZCFeC7g' });
+            var satelite = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', { attribution: 'SciCrop', maxZoom: 18, id: 'mapbox.satellite', accessToken: 'pk.eyJ1IjoidGhhbGVzZ2JyYW5kYW8iLCJhIjoiY2loM2llamx0MHl6Znd5bTB4b3BpZHJyZiJ9.Auxd4uKeTzg3AhyZCFeC7g' });
+           
+            // ------ Creating map options -----------
+            map = L.map('map', {
+                center: [-20.555251, -48.760627],
+                zoom: 20,
+                zoomControl: false,
+                maxZoom: 22,
+                minZoom: 0,
+                touchZoom: false,
+                zoomAnimationThreshold: 2,
+                doubleClickZoom: false,
+                layers: [normal, satelite],
+                fullscreenControl: true,
+                fullscreenControlOptions: {
+                    position: 'topright'
+                }
+            });
+              
+            // ------ sideBySide -----------
+            sideByside = L.control.sideBySide(normal, satelite).addTo(map);
+              
+            // ------ Creating FullScreen options -----------
+            customZoom = L.control.zoom({
+                position: 'topleft'
+            }).addTo(map);
+            // events are fired when entering or exiting fullscreen.
+            map.on('enterFullscreen', function(){
+            console.log('entered fullscreen');
+            });
+
+            map.on('exitFullscreen', function(){
+            console.log('exited fullscreen');
+            });
+            
+            // ------ Plot polygon -----------            
+            var lines = {"type": "Feature", "geometry": {"type": "MultiPolygon", "coordinates": [[[[-49.02581903, -20.374413000999937], [-49.025878829999954, -20.374577211999963], [-49.02591702099994, -20.374742693999963], [-49.02593293499996, -20.374824039999964], [-49.02594347999997, -20.375070130999973], [-49.025929047999966, -20.37515231699996], [-49.02591472499995, -20.375232178999966], [-49.025902633999976, -20.375389261999942], [-49.02592221699996, -20.375547365999978], [-49.02594709799996, -20.37562606499995], [-49.02601592299993, -20.375770974999966], [-49.02610641899997, -20.375980650999963], [-49.026153567999984, -20.376139439999974], [-49.02616666499995, -20.376224865999973], [-49.026197051999986, -20.37667588399995], [-49.02619959499998, -20.37712484599996], [-49.02622312899996, -20.377225144999954], [-49.02624090799998, -20.37724986199993], [-49.02639063999993, -20.37732091199996], [-49.02711324899997, -20.377610930999936], [-49.02970309899996, -20.37869509799998], [-49.03148720899998, -20.379442422999944], [-49.031605652999986, -20.37948172199998], [-49.03179332299993, -20.379540240999972], [-49.03173730399993, -20.37917274499995], [-49.03043148399996, -20.373469238999974], [-49.02760969299993, -20.37347455899993], [-49.02603046499996, -20.37344405899995], [-49.02555006599994, -20.373451623999927], [-49.02553522799997, -20.373458092999954], [-49.02549206799995, -20.37350741199998], [-49.02545678499996, -20.373651774999928], [-49.02547877699993, -20.373785934999944], [-49.02551082999997, -20.373847544999933], [-49.025666247999936, -20.374124002999963], [-49.02581903, -20.374413000999937]]], [[[-49.030480453999985, -20.37346914699998], [-49.031784468999945, -20.379164756999955], [-49.03184577899998, -20.37956696699996], [-49.031901955999956, -20.379596867999965], [-49.031996712999955, -20.37963487299993], [-49.032057779999946, -20.37964021299996], [-49.03210337199994, -20.37963065799994], [-49.03217333699996, -20.379628681999975], [-49.032207580999966, -20.379661813999974], [-49.03222486499993, -20.379696757999966], [-49.03227352799996, -20.379758073999938], [-49.03230432799995, -20.379774621999957], [-49.03245432699998, -20.379834882999944], [-49.03313773999997, -20.380109748999928], [-49.033668372999955, -20.380291279999938], [-49.03385645099996, -20.380379717999972], [-49.034022483999934, -20.380449152999972], [-49.034130981999965, -20.38046234899997], [-49.03417998699996, -20.380451986999958], [-49.03422298999993, -20.380426154999952], [-49.034257156999956, -20.380387601999928], [-49.034280395999986, -20.38033364499995], [-49.03429692799995, -20.380267147999973], [-49.034335563999946, -20.379790681999964], [-49.03453305399995, -20.375649642999974], [-49.03453326799996, -20.37564970899996], [-49.034556918999954, -20.375501078999946], [-49.03458108799998, -20.37496765999998], [-49.03459585, -20.374298331999967], [-49.03460325499998, -20.3741564499999], [-49.03460410599996, -20.373582737999982], [-49.034565370999985, -20.373502624999958], [-49.03452644499998, -20.373483010999962], [-49.034096734999935, -20.37346226099993], [-49.030480453999985, -20.37346914699998]]]]}, "properties": {"b": 410021}};
+                        
+            // ------ teste vant fail ----------------
+            $.ajax({
+                url: 'http://18.228.201.226/api/aws/s3-raw/tesla-dump/scicrop-agroapi-vant/2018-19/410021/2018-05-14/plantingfail/test.json',
+                headers: {'Content-Type': 'application/json'},
+                method: 'GET',
+                dataType:'json',
+                success:  (data) => {
+                    var cropLines = data.layers[1].geojson;	
+                    var failCropLines = data.layers[2].geojson;	
+                    var polygon = data.layers[0].geojson;
+                        
+                    // ------ Centralizando -----------		
+                    var centroid = turf.centroid(cropLines);
+                    map.panTo(new L.LatLng(centroid.geometry.coordinates[1],centroid.geometry.coordinates[0]));
+                                
+                    // ------ ADD Json checkBox -----------		
+                    var dois  = new L.GeoJSON(lines,{
+                        //color: "#B71C1C",
+                        //"color": "#ffffff",
+                        weight: 2,
+                        fill:false
+                    }).addTo(map);
+                        
+                    var CropLines  = new L.GeoJSON(cropLines,{
+                        color: "#00ff00",
+                        weight: 2,
+                        opacity: 0.5
+                    });
+                        
+                    var FailCropLines  = new L.GeoJSON(failCropLines,{
+                        color: "#ff0000",
+                        weight: 3,
+                        opacity: 1
+                    });                        
+                        
+                    var Polygon  = new L.GeoJSON(polygon,{
+                        color: "#ffff00",
+                        weight: 1,
+                        opacity: 0.2
+                    });                           
+                        
+                    // ------ Creating map options -----------	
+                    var overlays = {
+                        'VANT':vant,
+                        'Shape':dois,
+                        'Poligonos':Polygon,
+                        'Linhas de Plantio':CropLines,
+                        'Linhas de Falha':FailCropLines                        
+                    };
+                                               
+                    var overlays2 = {
+                        'FailCropLines':FailCropLines
+                    };
+
+                    L.control.layers(null, overlays).addTo(map);	                   
+                }              
+            });       
+        }        
+    </script>
+
+
+
+</body>
+</html>
