@@ -83,7 +83,11 @@
         function drawMap(){
 
             // ------ Creating a Layer object -----------
-            var vant = L.tileLayer(url_vant+'tesla-dump/scicrop-agroapi-vant/2018-19/410021/2018-05-14/tiles/{z}/{x}/{y}.png', { tms: true, opacity: 1, minZoom: 14, maxZoom: 22, minNativeZoom: 14, maxNativeZoom: 22, });
+            var url ="https://s3.amazonaws.com/scicrop-cana/extsat-ndvi-tiles/00/S2B_MSIL1C_20190103T133219_N0207_R081_T22KGC_20190103T151340"
+            var ndvi = L.tileLayer(url + '/{z}/{x}/{y}.png', { tms: true, opacity: 1, minZoom: 0, maxZoom: 22, minNativeZoom: 10, maxNativeZoom: 14 });
+
+           
+            var vant = L.tileLayer(url_vant+'tesla-dump/scicrop-agroapi-vant/2018-19/410021/2018-05-14/tiles/{z}/{x}/{y}.png', { tms: true, opacity: 1, minZoom: 10, maxZoom: 22, minNativeZoom: 14, maxNativeZoom: 22, });
             //var vant = L.tileLayer(url_vant+'tesla-dump/scicrop-agroapi-vant/2018-19/401314/2018-08-06/tiles/{z}/{x}/{y}.png', { tms: true, opacity: 1, minZoom: 14, maxZoom: 22, minNativeZoom: 14, maxNativeZoom: 22, });
 
             var normal = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', { attribution: 'SciCrop', maxZoom: 18, id: 'mapbox.streets', accessToken: 'pk.eyJ1IjoidGhhbGVzZ2JyYW5kYW8iLCJhIjoiY2loM2llamx0MHl6Znd5bTB4b3BpZHJyZiJ9.Auxd4uKeTzg3AhyZCFeC7g' });
@@ -92,7 +96,7 @@
             // ------ Creating map options -----------
             map = L.map('map', {
                 center: [-20.555251, -48.760627],
-                zoom: 20,
+                zoom: 10,
                 zoomControl: false,
                 maxZoom: 22,
                 minZoom: 0,
@@ -169,6 +173,7 @@
                         
                     // ------ Creating map options -----------	
                     var overlays = {
+                        'NDVI':ndvi,
                         'VANT':vant,
                         'Shape':dois,
                         'Poligonos':Polygon,
